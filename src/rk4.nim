@@ -1,9 +1,9 @@
 import sequtils
 
 proc rk4*( model: proc(time: float; populationSizes: seq[float]): seq[float]
-        ; timeSpan: seq[float] # a vector containing 3 values: [timeStart, timeEnd, timeStep] 
-        ; initialPopulations: seq[float]
-        ) : seq[seq[float]] =
+         ; timeSpan: seq[float] # a vector containing 3 values: [timeStart, timeEnd, timeStep] 
+         ; initialPopulations: seq[float]
+         ) : seq[seq[float]] =
 
   let
     # resSeqSize: int   = len(initialPopulations) + 1 # plus 1 for time value
