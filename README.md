@@ -2,3 +2,7 @@
 
 Run `run_plot_model.py` from `scripts/` directory.
 There are some dependencies though.
+
+#### TODOs
+  + bifurcation
+  + futurize
