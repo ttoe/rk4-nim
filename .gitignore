@@ -1,0 +1,9 @@
+.DS_Store
+.vscode/
+nimcache/
+*.csv
+lotka_volterra
+rma
+chemostat
+*.png
+NOTES.md
