@@ -22,7 +22,7 @@ plt.savefig("rma.png")
 # chemostat
 chemostat_data = pd.read_csv("chemostat_data.csv", sep="\t", header=0, index_col=False)
 
-chemostat_data.plot(x="time", y=["X", "Y"])
+chemostat_data.plot(x="time", y=["S", "C1", "C2", "P", "T"])
 plt.xlabel("time")
 plt.ylabel("population density")
 plt.savefig("chemostat.png")
