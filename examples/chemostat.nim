@@ -4,15 +4,16 @@ import ../src/rk4
 import ../src/csv
 
 const
-  speciesNames: seq[string] = @["S", "C1", "C2", "P", "T"]
-  timeRange:    seq[float]  = @[0.0, 500.0, 0.01]
-  initPops:     seq[float]  = @[0.5, 0.5, 0.5, 0.2, 0.0]
+  headerNames: seq[string] = @["time", "S", "C1", "C2", "P", "T"]
+  timeRange:   seq[float]  = @[0.0, 500.0, 0.01]
+  initPops:    seq[float]  = @[0.5, 0.5, 0.5, 0.2, 0.0]
 
   # Data output
   outFileName  = "chemostat_data.csv"
   outPrecision = 5
 
-  # Model parameters
+# Model parameters
+var
   d:    float = 0.05
   si:   float = 4.0
   gc:   float = 0.5
@@ -51,6 +52,6 @@ let modelResult = rk4(chemostat, timeRange, initPops)
 
 writeCsv( outFileName
         , sep="\t"
-        , species=speciesNames
+        , header=headerNames
         , data=modelResult
-        , precision = outPrecision)
+        , precision=outPrecision)
