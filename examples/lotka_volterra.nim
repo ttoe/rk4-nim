@@ -19,7 +19,7 @@ const
   d: float = 0.2
   
 # Lotka-Volterra model
-proc lotkaVolterra(t: float; pops: seq[float]): seq[float] =
+proc lotkaVolterra(t: float, pops: seq[float]): seq[float] =
   let
     X  = pops[0]
     Y  = pops[1]

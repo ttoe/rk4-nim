@@ -18,7 +18,7 @@ const
   c: float = 0.2
 
 # Rosezweig-MacArtur model
-proc rma(t: float; pops: seq[float]): seq[float] =
+proc rma(t: float, pops: seq[float]): seq[float] =
   let
     X = pops[0]
     Y = pops[1]

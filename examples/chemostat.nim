@@ -29,7 +29,7 @@ const
   xtp:  float = 0.3
 
 # Chemostat model
-proc chemostat(t: float; pops: seq[float]): seq[float] =
+proc chemostat(t: float, pops: seq[float]): seq[float] =
   let
     s  = pops[0]
     c1 = pops[1]
