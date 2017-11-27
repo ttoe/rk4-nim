@@ -5,19 +5,20 @@ import ../src/csv
 import ../src/util
 
 const
-  timeRange:   seq[float]  = @[0.0, 5000.0, 0.1]
-  initPops:    seq[float]  = @[0.5, 0.5, 0.5, 0.2, 0.0]
-
   # Bifurcation
   runBifurcation: bool = false
 
   # Data output
-  outFileName  = "chemostat_data.csv"
+  outFileName:  string = "chemostat_data.csv"
+  outPrecision: int    = 5
+  outTimeFrame: int    = 5000
   headerNames: seq[string] = @["time", "S", "C1", "C2", "P", "T"]
-  outPrecision = 5
 
-  writeOnlyTimeFrame: bool = true
-  timeFrame: int = 5000
+  # Solution time steps
+  timeRange:   seq[float]  = @[0.0, 5000.0, 0.1]
+
+  # Initial conditions
+  initPops:    seq[float]  = @[0.5, 0.5, 0.5, 0.2, 0.0]
 
 # Model parameters
 var
@@ -59,16 +60,10 @@ let modelResult = rk4(chemostat, timeRange, initPops)
 
 # Output
 
-var writeResult: seq[seq[float]]
-if writeOnlyTimeFrame:
-  writeResult = modelResult[(modelResult.high-timeFrame)..^1]
-else:
-  writeResult = modelResult
-
 writeCsv( outFileName
         , sep="\t"
         , header=headerNames
-        , data=writeResult
+        , data=modelResult[^outTimeFrame..^1]
         , precision=outPrecision)
 
 # Bifurcation
