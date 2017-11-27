@@ -16,6 +16,9 @@ const
   headerNames: seq[string] = @["time", "S", "C1", "C2", "P", "T"]
   outPrecision = 5
 
+  writeOnlyTimeFrame: bool = true
+  timeFrame: int = 5000
+
 # Model parameters
 var
   d:    float = 0.05
@@ -54,13 +57,22 @@ proc chemostat(t: float, pops: seq[float]): seq[float] =
 
 let modelResult = rk4(chemostat, timeRange, initPops)
 
+# Output
+
+var writeResult: seq[seq[float]]
+if writeOnlyTimeFrame:
+  writeResult = modelResult[(modelResult.high-timeFrame)..^1]
+else:
+  writeResult = modelResult
+
 writeCsv( outFileName
         , sep="\t"
         , header=headerNames
-        , data=modelResult
+        , data=writeResult
         , precision=outPrecision)
 
-# bifurcation
+# Bifurcation
+
 if runBifurcation:
   const
     bifParStart: float = 0.1
