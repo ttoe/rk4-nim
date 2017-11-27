@@ -1,4 +1,4 @@
-#### A naive implementation of Runge
+#### An implementation of the classical Runge-Kutta method
 
 Run `run_plot_model.py` from `scripts/` directory.
 
