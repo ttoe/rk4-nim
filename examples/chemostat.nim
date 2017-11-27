@@ -1,15 +1,15 @@
-import strutils
+import strutils, future, sequtils
 
 import ../src/rk4
 import ../src/csv
 
 const
-  headerNames: seq[string] = @["time", "S", "C1", "C2", "P", "T"]
-  timeRange:   seq[float]  = @[0.0, 500.0, 0.01]
+  timeRange:   seq[float]  = @[0.0, 1000.0, 0.1]
   initPops:    seq[float]  = @[0.5, 0.5, 0.5, 0.2, 0.0]
 
   # Data output
   outFileName  = "chemostat_data.csv"
+  headerNames: seq[string] = @["time", "S", "C1", "C2", "P", "T"]
   outPrecision = 5
 
 # Model parameters
@@ -20,7 +20,7 @@ var
   xc:   float = 0.3
   kmax: float = 0.3
   p1:   float = 1.0
-  p2:   float = 0.1
+  p2:   float = 0.0
   a:    float = 0.29
   gp:   float = 0.5
   kp:   float = 0.5
@@ -55,3 +55,51 @@ writeCsv( outFileName
         , header=headerNames
         , data=modelResult
         , precision=outPrecision)
+
+# bifurcation
+
+const
+  bifParStart: float = 0.1
+  bifParStep:  float = 0.1
+  bifParEnd:   float = 0.3
+
+var
+  bifRes = newSeq[seq[float]](0)
+  bifVal = bifParStart
+
+# This is hacky. Comparing floats is a problem ...
+# Maybe generate the bifVals als linearly spaced seq
+while bifVal <= (bifParEnd + 0.5*bifParStep):
+  si = bifVal
+  echo("Computing for si = " & formatFloat(bifVal, ffDecimal, 3))
+
+  let modelResult = rk4(chemostat, timeRange, initPops)
+  # taking the last value of time series and then removing first value (time)
+  var retArr      = (modelResult[^1])[1..^1]
+  retArr.insert(bifVal, 0)
+  bifRes.add(retArr)
+
+  bifVal += bifParStep
+
+proc maximaIxs(fs: seq[float]): seq[int] =
+  var maxIxs = newSeq[int](0)
+  for i in 1..(fs.high-1):
+    if fs[i] > fs[i-1] and fs[i] > fs[i+1]:
+      maxIxs.add(i)
+    if fs[i-1] == fs[i] and fs[i] == fs[i+1]:
+      maxIxs.add(i)
+  return maxIxs
+
+proc minimaIxs(fs: seq[float]): seq[int] =
+  return maximaIxs(fs.map(x => x * (-1)))
+
+# proc removeConsecutiveMaxIxsAndKeepMiddleOne
+
+#                          0   1   2   3   4   5    6   7    8   9  10
+let vals: seq[float] = @[0.1,0.2,0.4,0.5,0.2,0.1,-0.1,0.0,-0.2,0.1,0.3]
+
+echo maximaIxs(vals)
+echo maximaIxs(vals).map(i => vals[i])
+
+echo minimaIxs(vals)
+echo minimaIxs(vals).map(i => vals[i])

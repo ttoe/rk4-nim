@@ -1,8 +1,7 @@
-### Using Nim to solve ODEs
+#### A naive implementation of Runge
 
 Run `run_plot_model.py` from `scripts/` directory.
-There are some dependencies though.
+Dependencies: Python 3.6 with `matplotlib` and `pandas`.
 
 #### TODOs
   + bifurcation
-  + futurize
