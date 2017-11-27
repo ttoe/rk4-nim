@@ -5,8 +5,11 @@ import ../src/csv
 import ../src/util
 
 const
-  timeRange:   seq[float]  = @[0.0, 1000.0, 0.1]
+  timeRange:   seq[float]  = @[0.0, 5000.0, 0.1]
   initPops:    seq[float]  = @[0.5, 0.5, 0.5, 0.2, 0.0]
+
+  # Bifurcation
+  runBifurcation: bool = false
 
   # Data output
   outFileName  = "chemostat_data.csv"
@@ -58,35 +61,26 @@ writeCsv( outFileName
         , precision=outPrecision)
 
 # bifurcation
-
-const
-  bifParStart: float = 0.1
-  bifParStep:  float = 0.1
-  bifParEnd:   float = 0.3
-
-var
-  bifRes = newSeq[seq[float]](0)
-  bifVal = bifParStart
-
-# This is hacky. Comparing floats is a problem ...
-# Maybe generate the bifVals als linearly spaced seq
-while bifVal <= (bifParEnd + 0.5*bifParStep):
-  si = bifVal
-  echo("Computing for si = " & formatFloat(bifVal, ffDecimal, 3))
-
-  let modelResult = rk4(chemostat, timeRange, initPops)
-  # taking the last value of time series and then removing first value (time)
-  var retArr      = (modelResult[^1])[1..^1]
-  retArr.insert(bifVal, 0)
-  bifRes.add(retArr)
-
-  bifVal += bifParStep
-
-#                          0   1   2   3   4   5    6   7    8   9  10
-let vals: seq[float] = @[0.1,0.2,0.4,0.5,0.2,0.1,-0.1,0.0,-0.2,0.1,0.3]
-
-echo maximaIxs(vals)
-echo maximaVals(vals)
-
-echo minimaIxs(vals)
-echo minimaVals(vals)
+if runBifurcation:
+  const
+    bifParStart: float = 0.1
+    bifParStep:  float = 0.1
+    bifParEnd:   float = 0.3
+  
+  var
+    bifRes = newSeq[seq[float]](0)
+    bifVal = bifParStart
+  
+  # This is hacky. Comparing floats is a problem ...
+  # Maybe generate the bifVals als linearly spaced seq
+  while bifVal <= (bifParEnd + 0.5*bifParStep):
+    si = bifVal
+    echo("Running with: " & formatFloat(bifVal, ffDecimal, 3))
+  
+    let modelResult = rk4(chemostat, timeRange, initPops)
+    # taking the last value of time series and then removing first value (time)
+    var retArr      = (modelResult[^1])[1..^1]
+    retArr.insert(bifVal, 0)
+    bifRes.add(retArr)
+  
+    bifVal += bifParStep
