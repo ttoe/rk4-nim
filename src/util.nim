@@ -16,6 +16,15 @@ proc maximaVals*(fs: seq[float]): seq[float] =
 proc minimaVals*(fs: seq[float]): seq[float] =
   return minimaIxs(fs).map(i => fs[i])
 
+proc minMaxVals*(fs: seq[float]): seq[float] =
+  return concat(minimaVals(fs), maximaVals(fs))
+
+proc minMaxOrLastVals*(fs: seq[float]): seq[float] =
+  var minsMaxs: seq[float] = minMaxVals(fs)
+  if minsMaxs.len == 0:
+    minsMaxs.add(fs[^1])
+  return minsMaxs
+
 # proc removeConsecutiveMaxIxsAndKeepMiddleOne
 
 proc transpose*[A](seqs: seq[seq[A]]): seq[seq[A]] =
@@ -27,3 +36,7 @@ proc transpose*[A](seqs: seq[seq[A]]): seq[seq[A]] =
       tmp.add(j[i])
     res.add(tmp)
   return res
+
+proc equalizeSeqLengths*(seqs: seq[seq[float]]): seq[seq[float]] =
+  let maxLength: int = max(seqs.map(s => len(s)))
+  return seqs.map(s => concat(s, repeat(s[0], maxLength-s.len)))
