@@ -24,4 +24,24 @@ chemostat_data["CT"] = chemostat_data["C1"] + chemostat_data["C2"]
 chemostat_data.plot(x="time", y=["CT", "P", "T"])
 plt.xlabel("time")
 plt.ylabel("population density")
-plt.savefig("chemostat.png")
+plt.savefig("chemostat_ct_p_tp.png")
+
+### chemostat_data.plot(x="time", y=["CT", "P", "T"], logy=True)
+### plt.xlabel("time")
+### plt.ylabel("population density")
+### plt.savefig("chemostat_log_ct_p_tp.png")
+
+### chemostat_data.plot(x="time", y=["S", "C1", "C2", "CT", "P", "T"], logy=True)
+### plt.xlabel("time")
+### plt.ylabel("population density")
+### plt.savefig("chemostat_log_all.png")
+
+chemostat_data.plot(x="time", y=["S", "C1", "C2", "CT", "P", "T"])
+plt.xlabel("time")
+plt.ylabel("population density")
+plt.savefig("chemostat_all.png")
+
+### chemostat_data.plot(x="time", y=["C1", "C2", "P"])
+### plt.xlabel("time")
+### plt.ylabel("population density")
+### plt.savefig("chemostat_c1_c2_p.png")
