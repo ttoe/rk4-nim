@@ -1,4 +1,4 @@
-import strutils
+import strutils, sequtils, future
 
 import ../src/rk4
 import ../src/csv
@@ -6,24 +6,30 @@ import ../src/util
 
 const
   # Bifurcation
-  runBifurcation: bool = false
+  runBifurcation: bool = true
+
+  # Solution time steps
+  tStart:    float = 0.0
+  tEnd:      float = 15000.0
+  tStep:     float = 0.1
+  tLastOut:  float = 100.0
+
+  timeRange: seq[float] = @[tStart, tEnd, tStep]
 
   # Data output
   outFileName:  string = "chemostat_data.csv"
   outPrecision: int    = 5
-  outTimeFrame: int    = 5000
+  outTimeFrame: int    = toInt(tLastOut/tStep) + 1
   headerNames: seq[string] = @["time", "S", "C1", "C2", "P", "T"]
 
-  # Solution time steps
-  timeRange:   seq[float]  = @[0.0, 5000.0, 0.1]
 
   # Initial conditions
-  initPops:    seq[float]  = @[0.5, 0.5, 0.5, 0.2, 0.0]
+  initPops:    seq[float]  = @[0.5, 0.5, 0.5, 0.2, 0.2]
 
 # Model parameters
 var
   d:    float = 0.05
-  si:   float = 4.0
+  si:   float = 2.8
   gc:   float = 0.5
   xc:   float = 0.3
   kmax: float = 0.3
@@ -70,24 +76,24 @@ writeCsv( outFileName
 
 if runBifurcation:
   const
-    bifParStart: float = 0.1
+    bifParStart: float = 2.8
+    bifParEnd:   float = 2.8
     bifParStep:  float = 0.1
-    bifParEnd:   float = 0.3
   
   var
-    bifRes = newSeq[seq[float]](0)
+    # bifRes = newSeq[seq[float]](0)
     bifVal = bifParStart
   
   # This is hacky. Comparing floats is a problem ...
   # Maybe generate the bifVals als linearly spaced seq
   while bifVal <= (bifParEnd + 0.5*bifParStep):
     si = bifVal
-    echo("Running with: " & formatFloat(bifVal, ffDecimal, 3))
-  
-    let modelResult = rk4(chemostat, timeRange, initPops)
-    # taking the last value of time series and then removing first value (time)
-    var retArr      = (modelResult[^1])[1..^1]
-    retArr.insert(bifVal, 0)
-    bifRes.add(retArr)
-  
+    echo bifVal
+
+    let
+      modelResult = rk4(chemostat, timeRange, initPops)
+      transposed = transpose(modelResult)[1..^1]
+      bifValMinsMaxs = transposed.map(minMaxOrLastVals)
+      equalized = equalizeSeqLengths(bifValMinsMaxs)
+
     bifVal += bifParStep
