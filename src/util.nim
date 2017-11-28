@@ -17,3 +17,13 @@ proc minimaVals*(fs: seq[float]): seq[float] =
   return minimaIxs(fs).map(i => fs[i])
 
 # proc removeConsecutiveMaxIxsAndKeepMiddleOne
+
+proc transpose*[A](seqs: seq[seq[A]]): seq[seq[A]] =
+  ## This procedure assumes a sequence of equal length sequences.
+  var res = newSeq[seq[A]](0)
+  for i in 0..seqs[0].high:
+    var tmp = newSeq[A](0)
+    for j in seqs:
+      tmp.add(j[i])
+    res.add(tmp)
+  return res
