@@ -1,9 +1,9 @@
-import sequtils, future
+import sequtils, future, math
 
 proc maximaIxs*(fs: seq[float]): seq[int] =
   var maxIxs = newSeq[int](0)
   for i in 1..(fs.high-1):
-    if (fs[i] > fs[i-1] and fs[i] > fs[i+1]) or fs[i-1] == fs[i] and fs[i] == fs[i+1]:
+    if (fs[i] > fs[i-1] and fs[i] > fs[i+1]): # or fs[i-1] == fs[i] and fs[i] == fs[i+1]:
       maxIxs.add(i)
   return maxIxs
 
