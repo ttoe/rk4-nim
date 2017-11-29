@@ -48,27 +48,27 @@ plt.savefig("chemostat_all.png")
 
 bif_chemostat_data = pd.read_csv("bif_chemostat.csv", sep="\t", header=0, index_col=False)
 
-bif_chemostat_data.plot.scatter(x="time", y="S")
+bif_chemostat_data.plot.scatter(x="time", y="S", s=1)
 plt.xlabel("parameter")
 plt.ylabel("minima / maxima")
 plt.savefig("bif_chemostat_S.png")
 
-bif_chemostat_data.plot.scatter(x="time", y="C1")
+bif_chemostat_data.plot.scatter(x="time", y="C1", s=1)
 plt.xlabel("parameter")
 plt.ylabel("minima / maxima")
 plt.savefig("bif_chemostat_C1.png")
 
-bif_chemostat_data.plot.scatter(x="time", y="C2")
+bif_chemostat_data.plot.scatter(x="time", y="C2", s=1)
 plt.xlabel("parameter")
 plt.ylabel("minima / maxima")
 plt.savefig("bif_chemostat_C2.png")
 
-bif_chemostat_data.plot.scatter(x="time", y="P")
+bif_chemostat_data.plot.scatter(x="time", y="P", s=1)
 plt.xlabel("parameter")
 plt.ylabel("minima / maxima")
 plt.savefig("bif_chemostat_P.png")
 
-bif_chemostat_data.plot.scatter(x="time", y="T")
+bif_chemostat_data.plot.scatter(x="time", y="T", s=1)
 plt.xlabel("parameter")
 plt.ylabel("minima / maxima")
 plt.savefig("bif_chemostat_T.png")
