@@ -1,4 +1,4 @@
-import strutils, sequtils, future
+import strutils, sequtils, future, math
 
 import ../src/rk4
 import ../src/csv
@@ -12,14 +12,14 @@ const
   tStart:    float = 0.0
   tEnd:      float = 15000.0
   tStep:     float = 0.1
-  tLastOut:  float = 100.0
+  tLastOut:  float = 1000.0
 
   timeRange: seq[float] = @[tStart, tEnd, tStep]
 
   # Data output
   outFileName:  string = "chemostat_data.csv"
   outPrecision: int    = 5
-  outTimeFrame: int    = toInt(tLastOut/tStep) + 1
+  outTimeFrame: int    = toInt(floor(tLastOut/tStep))
   headerNames: seq[string] = @["time", "S", "C1", "C2", "P", "T"]
 
 
@@ -76,13 +76,11 @@ writeCsv( outFileName
 
 if runBifurcation:
   const
-    bifParStart: float = 2.8
-    bifParEnd:   float = 2.8
+    bifParStart: float = 4.0
+    bifParEnd:   float = 4.0
     bifParStep:  float = 0.1
   
-  var
-    # bifRes = newSeq[seq[float]](0)
-    bifVal = bifParStart
+  var bifVal = bifParStart
   
   # This is hacky. Comparing floats is a problem ...
   # Maybe generate the bifVals als linearly spaced seq
@@ -92,8 +90,9 @@ if runBifurcation:
 
     let
       modelResult = rk4(chemostat, timeRange, initPops)
-      transposed = transpose(modelResult)[1..^1]
+      transposed = transpose(modelResult[^outTimeFrame..^1])[1..^1]
       bifValMinsMaxs = transposed.map(minMaxOrLastVals)
       equalized = equalizeSeqLengths(bifValMinsMaxs)
+      # equalizedWithBifVal = equalized.insert(repeat(bifVal, equalized[0].len), 0)
 
     bifVal += bifParStep
