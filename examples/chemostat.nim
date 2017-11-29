@@ -12,7 +12,7 @@ const
   tStart:    float = 0.0
   tEnd:      float = 15000.0
   tStep:     float = 0.1
-  tLastOut:  float = 1000.0
+  tLastOut:  float = 5000.0
 
   timeRange: seq[float] = @[tStart, tEnd, tStep]
 
@@ -24,12 +24,12 @@ const
 
 
   # Initial conditions
-  initPops:    seq[float]  = @[0.5, 0.5, 0.5, 0.2, 0.2]
+  initPops:    seq[float]  = @[0.5, 0.5, 0.5, 0.2, 0.0]
 
 # Model parameters
 var
   d:    float = 0.05
-  si:   float = 2.8
+  si:   float = 4.0
   gc:   float = 0.5
   xc:   float = 0.3
   kmax: float = 0.3
@@ -73,14 +73,15 @@ writeCsv( outFileName
         , precision=outPrecision)
 
 # Bifurcation
-
 if runBifurcation:
   const
-    bifParStart: float = 4.0
-    bifParEnd:   float = 4.0
-    bifParStep:  float = 0.1
+    bifParStart: float = 1.5
+    bifParEnd:   float = 8.0
+    bifParStep:  float = 0.01
   
-  var bifVal = bifParStart
+  var
+    bifVal: float = bifParStart
+    allMinsMaxs   = newSeq[seq[float]](0)
   
   # This is hacky. Comparing floats is a problem ...
   # Maybe generate the bifVals als linearly spaced seq
@@ -93,6 +94,16 @@ if runBifurcation:
       transposed = transpose(modelResult[^outTimeFrame..^1])[1..^1]
       bifValMinsMaxs = transposed.map(minMaxOrLastVals)
       equalized = equalizeSeqLengths(bifValMinsMaxs)
-      # equalizedWithBifVal = equalized.insert(repeat(bifVal, equalized[0].len), 0)
+      equalizedWithBifVal = transpose(equalized).map(x => concat(@[bifVal], x))
+
+    for i in equalizedWithBifVal:
+      allMinsMaxs.add(i)
 
     bifVal += bifParStep
+
+  writeCsv( outFile="bif_chemostat.csv"
+          , sep="\t"
+          , header=headerNames
+          , data=allMinsMaxs
+          , precision=outPrecision)
+      
