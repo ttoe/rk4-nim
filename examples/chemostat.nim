@@ -1,4 +1,4 @@
-import strutils, sequtils, future, math
+import strutils, sequtils, future, math, times
 
 import ../src/rk4
 import ../src/csv
@@ -74,6 +74,10 @@ writeCsv( outFileName
 
 # Bifurcation
 if runBifurcation:
+
+  # start timer
+  let startTime = cpuTime()
+
   const
     bifParStart: float = 1.5
     bifParEnd:   float = 8.0
@@ -86,7 +90,7 @@ if runBifurcation:
   # This is hacky. Comparing floats is a problem ...
   # Maybe generate the bifVals als linearly spaced seq
   while bifVal <= (bifParEnd + 0.5*bifParStep):
-    si = bifVal
+    si = bifVal # this determines the bifurcation parameter
     echo bifVal
 
     let
@@ -106,4 +110,7 @@ if runBifurcation:
           , header=headerNames
           , data=allMinsMaxs
           , precision=outPrecision)
-      
+
+  let timeTaken = cpuTime()-startTime
+  echo "Time for bifurcation: ", timeTaken
+  echo "Time per iteration: ", timeTaken/((bifParEnd-bifParStart)/bifParStep)
