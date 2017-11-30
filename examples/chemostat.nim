@@ -64,12 +64,38 @@ proc chemostat(t: float, pops: seq[float]): seq[float] =
 
 let modelResult = rk4(chemostat, timeRange, initPops)
 
+# generate some comments about the simulation parameters for the csv.
+# the way the bifurcation parameter is determined is suboptimal.
+# i'd rather like to specify it once and create a parameter set over which
+# the solving can be mapped.
+# this way also multiple parameters can be varied against each other 
+# and the list of parameter sets can be mapped over in parallel, ideally.
+# if the parameters were a hash map this would also not be necessary.
+
+var comment: string = 
+  "# bifurcation parameter: " & "si\n" &
+  "# d: "    & $d    & "\n" &
+  "# si: "   & $si   & "\n" &
+  "# gc: "   & $gc   & "\n" &
+  "# xc: "   & $xc   & "\n" & 
+  "# kmax: " & $kmax & "\n" &
+  "# p1: "   & $p1   & "\n" &
+  "# p2: "   & $p2   & "\n" &
+  "# a: "    & $a    & "\n" &
+  "# gp: "   & $gp   & "\n" &
+  "# kp: "   & $kp   & "\n" &
+  "# xp: "   & $xp   & "\n" &
+  "# gtp: "  & $gtp  & "\n" &
+  "# ktp: "  & $ktp  & "\n" &
+  "# xtp: "  & $xtp  & "\n" 
+
 # Output
 
 writeCsv( outFileName
         , sep="\t"
         , header=headerNames
         , data=modelResult[^outTimeFrame..^1]
+        , comment=comment
         , precision=outPrecision)
 
 # Bifurcation
@@ -79,9 +105,9 @@ if runBifurcation:
   let startTime = cpuTime()
 
   const
-    bifParStart: float = 1.5
-    bifParEnd:   float = 8.0
-    bifParStep:  float = 0.01
+    bifParStart: float = 2.5
+    bifParEnd:   float = 4.0
+    bifParStep:  float = 0.1
   
   var
     bifVal: float = bifParStart
@@ -90,7 +116,8 @@ if runBifurcation:
   # This is hacky. Comparing floats is a problem ...
   # Maybe generate the bifVals als linearly spaced seq
   while bifVal <= (bifParEnd + 0.5*bifParStep):
-    si = bifVal # this determines the bifurcation parameter
+    # SET CSV COMMENT!
+    si = bifVal # determines bifurcation parameter. 
     echo bifVal
 
     let
@@ -109,6 +136,7 @@ if runBifurcation:
           , sep="\t"
           , header=headerNames
           , data=allMinsMaxs
+          , comment=comment
           , precision=outPrecision)
 
   let timeTaken = cpuTime()-startTime
