@@ -11,6 +11,16 @@
 ### ../examples/rma
 
 echo "*** Compiling chemostat"
-nim c --verbosity:0 -f -d:release ../examples/chemostat.nim
+### -flto = link time optimization; supposed to inline more
+### -O3 = maximum optimizations
+### echo "flto"
+### nim c -r --passC:"-flto" --verbosity:0 --hints:off -f -d:release ../examples/chemostat.nim
+### echo "O3"
+### nim c -r --passC:"-O3" --verbosity:0 --hints:off -f -d:release ../examples/chemostat.nim
+### echo "flto O3"
+### nim c -r --passC:"-flto -O3" --verbosity:0 --hints:off -f -d:release ../examples/chemostat.nim
+### echo "nothing"
+### nim c -r --verbosity:0 --hints:off -f -d:release ../examples/chemostat.nim
+nim c --verbosity:0 --hints:off -f -d:release ../examples/chemostat.nim
 echo "*** Running chemostat"
-../examples/chemostat
+# ../examples/chemostat
