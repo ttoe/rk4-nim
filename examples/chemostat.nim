@@ -108,7 +108,7 @@ if runBifurcation:
     bifParStart: float = 2.5
     bifParEnd:   float = 4.0
     bifParStep:  float = 0.1
-  
+    
   var
     bifVal: float = bifParStart
     allMinsMaxs   = newSeq[seq[float]](0)
@@ -121,13 +121,13 @@ if runBifurcation:
     echo bifVal
 
     let
-      modelResult = rk4(chemostat, timeRange, initPops)
-      transposed = transpose(modelResult[^outTimeFrame..^1])[1..^1]
-      bifValMinsMaxs = transposed.map(minMaxOrLastVals)
-      equalized = equalizeSeqLengths(bifValMinsMaxs)
-      equalizedWithBifVal = transpose(equalized).map(x => concat(@[bifVal], x))
+      modelResult:    seq[seq[float]] = rk4(chemostat, timeRange, initPops)
+      transposed:     seq[seq[float]] = transpose(modelResult[^outTimeFrame..^1])[1..^1]
+      bifValMinsMaxs: seq[seq[float]] = transposed.map(minMaxOrLastVals)
+      equalized:      seq[seq[float]] = equalizeSeqLengths(bifValMinsMaxs)
+      eqWithBifVal:   seq[seq[float]] = transpose(equalized).map(x => concat(@[bifVal], x))
 
-    for i in equalizedWithBifVal:
+    for i in eqWithBifVal:
       allMinsMaxs.add(i)
 
     bifVal += bifParStep
