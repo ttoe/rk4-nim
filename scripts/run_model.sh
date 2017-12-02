@@ -23,4 +23,4 @@ echo "*** Compiling chemostat"
 ### nim c -r --verbosity:0 --hints:off -f -d:release ../examples/chemostat.nim
 nim c --verbosity:0 --hints:off -f -d:release ../examples/chemostat.nim
 echo "*** Running chemostat"
-# ../examples/chemostat
+../examples/chemostat
