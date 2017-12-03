@@ -108,18 +108,14 @@ if runBifurcation:
     bifParStart: float = 2.5
     bifParEnd:   float = 4.0
     bifParStep:  float = 0.1
-    
-  var
-    bifVal: float = bifParStart
-    allMinsMaxs   = newSeq[seq[float]](0)
-  
-  # This is hacky. Comparing floats is a problem ...
-  # Maybe generate the bifVals als linearly spaced seq
-  while bifVal <= (bifParEnd + 0.5*bifParStep):
-    # SET CSV COMMENT!
-    si = bifVal # determines bifurcation parameter. 
-    echo bifVal
 
+  let numSims: int = toInt((bifParEnd-bifParStart)/bifParStep)
+  # var resArray: array[numSims+1, seq[float]]
+  var resSeq = newSeq[seq[float]](0)
+  for i in 0 || numSims:
+    var bifVal = bifParStart+(toFloat(i)*bifParStep)
+    echo bifVal
+    si = bifVal
     let
       modelResult:    seq[seq[float]] = rk4(chemostat, timeRange, initPops)
       transposed:     seq[seq[float]] = transpose(modelResult[^outTimeFrame..^1])[1..^1]
@@ -128,17 +124,40 @@ if runBifurcation:
       eqWithBifVal:   seq[seq[float]] = transpose(equalized).map(x => concat(@[bifVal], x))
 
     for i in eqWithBifVal:
-      allMinsMaxs.add(i)
-
-    bifVal += bifParStep
+      resSeq.add(i)
 
   writeCsv( outFile="bif_chemostat.csv"
           , sep="\t"
           , header=headerNames
-          , data=allMinsMaxs
+          , data=resSeq
           , comment=comment
           , precision=outPrecision)
 
   let timeTaken = cpuTime()-startTime
   echo "Time for bifurcation: ", timeTaken
   echo "Time per iteration: ", timeTaken/((bifParEnd-bifParStart)/bifParStep)
+
+###   var
+###     bifVal: float = bifParStart
+###     allMinsMaxs   = newSeq[seq[float]](0)
+###   
+###   # This is hacky. Comparing floats is a problem ...
+###   # Maybe generate the bifVals als linearly spaced seq
+###   while bifVal <= (bifParEnd + 0.5*bifParStep):
+###     # SET CSV COMMENT!
+###     si = bifVal # determines bifurcation parameter. 
+###     echo bifVal
+### 
+###     let
+###       modelResult:    seq[seq[float]] = rk4(chemostat, timeRange, initPops)
+###       transposed:     seq[seq[float]] = transpose(modelResult[^outTimeFrame..^1])[1..^1]
+###       bifValMinsMaxs: seq[seq[float]] = transposed.map(minMaxOrLastVals)
+###       equalized:      seq[seq[float]] = equalizeSeqLengths(bifValMinsMaxs)
+###       eqWithBifVal:   seq[seq[float]] = transpose(equalized).map(x => concat(@[bifVal], x))
+### 
+###     for i in eqWithBifVal:
+###       allMinsMaxs.add(i)
+### 
+###     bifVal += bifParStep
+### 
+
