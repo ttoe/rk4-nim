@@ -1,4 +1,5 @@
-import strutils, sequtils, future, math, times
+{.experimental.}
+import strutils, sequtils, future, math, times, threadpool
 
 import ../src/rk4
 import ../src/csv
@@ -98,6 +99,23 @@ writeCsv( outFileName
         , comment=comment
         , precision=outPrecision)
 
+proc pipe( model: (float, seq[float]) -> seq[float]
+         , timeSpan: seq[float] # contains: [timeStart, timeEnd, timeStep] 
+         , initialPopulations: seq[float]
+         , bifVal: float
+         ): seq[seq[float]] =
+
+  echo bifVal
+  si = bifVal
+
+  let
+    modelResult:    seq[seq[float]] = rk4(chemostat, timeRange, initPops)
+    transposed:     seq[seq[float]] = transpose(modelResult[^outTimeFrame..^1])[1..^1]
+    bifValMinsMaxs: seq[seq[float]] = transposed.map(minMaxOrLastVals)
+    equalized:      seq[seq[float]] = equalizeSeqLengths(bifValMinsMaxs)
+    eqWithBifVal:   seq[seq[float]] = transpose(equalized).map(x => concat(@[bifVal], x))
+  return eqWithBifVal
+
 # Bifurcation
 if runBifurcation:
 
@@ -112,31 +130,37 @@ if runBifurcation:
   # start timer
   let startTime = cpuTime()
 
-  var resSeq = newSeq[seq[float]](0)
-  for i in 0..(numSims-1): # -1 because starting from 0
-    let bifVal = bifParStart+(toFloat(i)*bifParStep)
-    echo bifVal
-    si = bifVal
-    let
-      modelResult:    seq[seq[float]] = rk4(chemostat, timeRange, initPops)
-      transposed:     seq[seq[float]] = transpose(modelResult[^outTimeFrame..^1])[1..^1]
-      bifValMinsMaxs: seq[seq[float]] = transposed.map(minMaxOrLastVals)
-      equalized:      seq[seq[float]] = equalizeSeqLengths(bifValMinsMaxs)
-      eqWithBifVal:   seq[seq[float]] = transpose(equalized).map(x => concat(@[bifVal], x))
-    
-    for i in eqWithBifVal:
-      resSeq.add(i)
+  var resSeq = newSeq[seq[seq[float]]](numSims)
+  parallel:
+    for i in 0..(numSims-1): # -1 because starting from 0
+      let bifVal = bifParStart+(toFloat(i)*bifParStep)
 
-  writeCsv( outFile="bif_chemostat.csv"
-          , sep="\t"
-          , header=headerNames
-          , data=resSeq
-          , comment=comment
-          , precision=outPrecision)
+      resSeq[i] = spawn pipe(chemostat, timeRange, initPops, bifVal)
+  
+  var data = newSeq[seq[float]](0)
+  for res in resSeq:
+    for j in res:
+      data.add(j)
 
   let timeTaken = cpuTime()-startTime
   echo "Time for bifurcation: ", timeTaken
   echo "Time per iteration: ", timeTaken/((bifParEnd-bifParStart)/bifParStep)
+
+###       let
+###         modelResult:    seq[seq[float]] = rk4(chemostat, timeRange, initPops)
+###         transposed:     seq[seq[float]] = transpose(modelResult[^outTimeFrame..^1])[1..^1]
+###         bifValMinsMaxs: seq[seq[float]] = transposed.map(minMaxOrLastVals)
+###         equalized:      seq[seq[float]] = equalizeSeqLengths(bifValMinsMaxs)
+###         eqWithBifVal:   seq[seq[float]] = transpose(equalized).map(x => concat(@[bifVal], x))
+   # for i in eqWithBifVal:
+      # resSeq.add(i)
+
+  # writeCsv( outFile="bif_chemostat.csv"
+  #         , sep="\t"
+  #         , header=headerNames
+  #         , data=resSeq
+  #         , comment=comment
+  #         , precision=outPrecision)
 
 ###   var
 ###     bifVal: float = bifParStart
@@ -160,5 +184,3 @@ if runBifurcation:
 ###       allMinsMaxs.add(i)
 ### 
 ###     bifVal += bifParStep
-### 
-
