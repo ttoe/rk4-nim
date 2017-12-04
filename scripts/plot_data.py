@@ -18,13 +18,13 @@ import pandas as pd
 ### plt.savefig("rma.png")
 
 # chemostat
-chemostat_data = pd.read_csv("chemostat_data.csv", sep="\t", header=0, index_col=False, comment="#")
-chemostat_data["CT"] = chemostat_data["C1"] + chemostat_data["C2"]
-
-chemostat_data.plot(x="time", y=["CT", "P", "T"])
-plt.xlabel("time")
-plt.ylabel("population density")
-plt.savefig("chemostat_ct_p_tp.png")
+### chemostat_data = pd.read_csv("chemostat_data.csv", sep="\t", header=0, index_col=False, comment="#")
+### chemostat_data["CT"] = chemostat_data["C1"] + chemostat_data["C2"]
+### 
+### chemostat_data.plot(x="time", y=["CT", "P", "T"])
+### plt.xlabel("time")
+### plt.ylabel("population density")
+### plt.savefig("chemostat_ct_p_tp.png")
 
 ### chemostat_data.plot(x="time", y=["CT", "P", "T"], logy=True)
 ### plt.xlabel("time")
@@ -36,10 +36,10 @@ plt.savefig("chemostat_ct_p_tp.png")
 ### plt.ylabel("population density")
 ### plt.savefig("chemostat_log_all.png")
 
-chemostat_data.plot(x="time", y=["S", "C1", "C2", "CT", "P", "T"])
-plt.xlabel("time")
-plt.ylabel("population density")
-plt.savefig("chemostat_all.png")
+### chemostat_data.plot(x="time", y=["S", "C1", "C2", "CT", "P", "T"])
+### plt.xlabel("time")
+### plt.ylabel("population density")
+### plt.savefig("chemostat_all.png")
 
 ### chemostat_data.plot(x="time", y=["C1", "C2", "P"])
 ### plt.xlabel("time")

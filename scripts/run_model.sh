@@ -21,6 +21,6 @@ echo "*** Compiling chemostat"
 ### nim c -r --passC:"-flto -O3" --verbosity:0 --hints:off -f -d:release ../examples/chemostat.nim
 ### echo "nothing"
 ### nim c -r --verbosity:0 --hints:off -f -d:release ../examples/chemostat.nim
-nim c --passC:"-fopenmp" --threads:on --verbosity:0 --hints:off -f -d:release ../examples/chemostat.nim
+nim --passc:"-fopenmp" --passl:"-fopenmp" --hints:off c ../examples/chemostat.nim
 echo "*** Running chemostat"
 ../examples/chemostat

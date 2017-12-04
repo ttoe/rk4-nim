@@ -98,22 +98,28 @@ writeCsv( outFileName
         , comment=comment
         , precision=outPrecision)
 
+
+
 # Bifurcation
 if runBifurcation:
+
+  const
+    bifParStart: float = 3.9
+    bifParEnd:   float = 4.0
+    bifParStep:  float = 0.1
+    numSims:     int   = toInt((bifParEnd-bifParStart)/bifParStep)+1
+
+  echo "numSims: " & $numSims
 
   # start timer
   let startTime = cpuTime()
 
-  const
-    bifParStart: float = 2.5
-    bifParEnd:   float = 4.0
-    bifParStep:  float = 0.1
-
-  let numSims: int = toInt((bifParEnd-bifParStart)/bifParStep)
-  # var resArray: array[numSims+1, seq[float]]
-  var resSeq = newSeq[seq[float]](0)
-  for i in 0 || numSims:
-    var bifVal = bifParStart+(toFloat(i)*bifParStep)
+  var resArr: array[numSims, seq[seq[float]]]
+  # var resSeq = newSeq[seq[seq[float]]](numSims)
+  # var resCounter: int = 0
+  for i in 0||(numSims-1):
+    # echo "current resCounter: " & $resCounter
+    let bifVal = bifParStart+(toFloat(i)*bifParStep)
     echo bifVal
     si = bifVal
     let
@@ -122,16 +128,27 @@ if runBifurcation:
       bifValMinsMaxs: seq[seq[float]] = transposed.map(minMaxOrLastVals)
       equalized:      seq[seq[float]] = equalizeSeqLengths(bifValMinsMaxs)
       eqWithBifVal:   seq[seq[float]] = transpose(equalized).map(x => concat(@[bifVal], x))
+    
+    # dimensions are:
+    # sequence of bifurcation results for different parameter values
+    # each contains a sequence of different minima and maxima
+    # which are given as a sequence of all variables and the parameter value
+    resArr[i] = eqWithBifVal
 
-    for i in eqWithBifVal:
-      resSeq.add(i)
+  echo @resArr
+    # for ix, j in eqWithBifVal:
+      # echo $ix & "," & $(resCounter+ix) & "," & $j
+      # resSeq[resCounter+ix] = j
+    
+    # resCounter += eqWithBifVal.len
+    # echo "new resCounter: " & $resCounter
 
-  writeCsv( outFile="bif_chemostat.csv"
-          , sep="\t"
-          , header=headerNames
-          , data=resSeq
-          , comment=comment
-          , precision=outPrecision)
+  # writeCsv( outFile="bif_chemostat.csv"
+  #         , sep="\t"
+  #         , header=headerNames
+  #         , data=resSeq
+  #         , comment=comment
+  #         , precision=outPrecision)
 
   let timeTaken = cpuTime()-startTime
   echo "Time for bifurcation: ", timeTaken
