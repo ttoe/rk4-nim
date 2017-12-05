@@ -120,26 +120,25 @@ proc pipe( model: (float, seq[float]) -> seq[float]
 if runBifurcation:
 
   const
-    bifParStart: float = 2.5
+    bifParStart: float = 3.0
     bifParEnd:   float = 8.0
     bifParStep:  float = 0.1
     numSims:     int   = toInt((bifParEnd-bifParStart)/bifParStep)+1
 
-  echo numSims    
-
   # start timer
   let startTime = cpuTime()
 
-  var resSeq = newSeq[seq[seq[float]]](numSims)
+  var resSeq: array[numSims,FlowVar[seq[seq[float]]]]
   parallel:
-    for i in 0..(numSims-1): # -1 because starting from 0
+    for i in 0..numSims-1:
       let bifVal = bifParStart+(toFloat(i)*bifParStep)
-
       resSeq[i] = spawn pipe(chemostat, timeRange, initPops, bifVal)
+    sync()
   
   var data = newSeq[seq[float]](0)
-  for res in resSeq:
-    for j in res:
+  for res in 0..numSims-1:
+    let asd = ^resSeq[res]
+    for j in asd:
       data.add(j)
 
   let timeTaken = cpuTime()-startTime
